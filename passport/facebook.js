@@ -20,7 +20,7 @@ passport.use(new FacebookStrategy({
     callbackURL: 'http://localhost:3000/auth/facebook/callback',
     profileFields: ['email', 'name', 'displayName', 'photos']
 }, (accessToken, refreshToken, profile, done) => {
-    console.log(profile);
+    console.log(profile.photos[0].value);
     User.findOne({ facebook: profile.id }, (error, user) => {
         if (error) {
             return done(error);
@@ -33,7 +33,8 @@ passport.use(new FacebookStrategy({
                 fullname: profile.displayName,
                 firstname: profile.name.givenName,
                 lastname: profile.name.familyName,
-                image: `https://graph.facebook.com/{${profile.id}}/picture?size=large`,
+                image: profile.photos[0].value,
+                //`https://graph.facebook.com/{${profile.id}}/picture?size=large`,
                 email: profile.emails[0].value
             }
             new User(newUser).save((error, user) => {

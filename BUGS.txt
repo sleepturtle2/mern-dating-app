@@ -1,0 +1,1 @@
+1. cannot retrieve facebook profile image in high quality, not enough permissions

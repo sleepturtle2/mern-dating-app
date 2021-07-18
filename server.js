@@ -1,8 +1,4 @@
 require('dotenv').config();
-
-console.log(process.env.PORT);
-console.log(process.env.NODE_ENV)
-
 const express = require('express');
 const Handlebars = require('handlebars');
 const hbs = require('express-handlebars');
@@ -18,9 +14,6 @@ const Message = require('./models/message');
 const User = require('./models/user');
 
 const app = express();
-
-//load keys file
-//const Keys = require('./config/keys');
 
 //use body parser middleware
 app.use(express.urlencoded({ extended: false }));
@@ -84,7 +77,9 @@ app.get('/auth/facebook/callback', passport.authenticate('facebook', {
 
 app.get('/profile', (request, response) => {
     User.findById({ _id: request.user._id }).then((user) => {
+
         if (user) {
+            console.log(user);
             response.render('profile', {
                 title: 'Profile',
                 user: user
