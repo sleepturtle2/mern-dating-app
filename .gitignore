@@ -1,5 +1,6 @@
 #my custom files
 node_modules
+config/keys.js
 
 # Logs
 logs
