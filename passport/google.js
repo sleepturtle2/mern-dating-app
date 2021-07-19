@@ -15,7 +15,7 @@ passport.deserializeUser((id, done) => {
 passport.use(new GoogleStrategy({
     clientID: process.env.GoogleClientID,
     clientSecret: process.env.GoogleClientSecret,
-    callbackURL: 'http://localhost:3000/auth/google/callback'
+    callbackURL: 'https://mern-dating.herokuapp.com/auth/google/callback'
 }, (accessToken, refreshToken, profile, done) => {
     console.log(profile);
     User.findOne({ google: profile.id }, (error, user) => {
