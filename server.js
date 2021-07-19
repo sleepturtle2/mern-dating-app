@@ -137,7 +137,7 @@ app.get('/newAccount', (request, response) => {
 
 
 app.post('/signup', (request, response) => {
-    console.log(request.body);
+    //console.log(request.body);
     let errors = [];
 
     if (request.body.password !== request.body.password2) {
