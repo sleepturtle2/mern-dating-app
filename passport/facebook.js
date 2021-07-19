@@ -17,7 +17,7 @@ passport.deserializeUser((id, done) => {
 passport.use(new FacebookStrategy({
     clientID: process.env.FacebookAppID,
     clientSecret: process.env.FacebookAppSecret,
-    callbackURL: 'http://localhost:3000/auth/facebook/callback',
+    callbackURL: 'https://mern-dating.herokuapp.com/auth/facebook/callback',
     profileFields: ['email', 'name', 'displayName', 'photos']
 }, (accessToken, refreshToken, profile, done) => {
     //console.log(profile.photos[0].value);
