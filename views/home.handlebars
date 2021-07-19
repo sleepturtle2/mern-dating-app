@@ -1,2 +1,29 @@
 <h1>Welcome to online dating</h1>
-<a href="/auth/facebook"><button class="btn btn-primary">Login with Facebook</button></a>
+{{#if user }}
+<p>You are logged in..</p>
+{{else}}
+<div class="row">
+  <div class="col-sm-4">
+    <h1 class="center">
+      <a href="/auth/facebook"><button class="btn btn-primary">Login with Facebook</button></a>
+    </h1>
+    <h1 class="center">
+      <a href="/auth/google"><button class="btn btn-danger">Login with Google
+        </button></a>
+    </h1>
+    <p class="center">or</p>
+    <form action="/login">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="text" name="email" id="email" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" class="form-control">
+      </div>
+      <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+    <a href="/newAccount">Need Account?</a>
+  </div>
+</div>
+{{/if}}
