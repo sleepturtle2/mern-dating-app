@@ -20,7 +20,7 @@ passport.use(new FacebookStrategy({
     callbackURL: 'https://mern-dating.herokuapp.com/auth/facebook/callback',
     profileFields: ['email', 'name', 'displayName', 'photos']
 }, (accessToken, refreshToken, profile, done) => {
-    //console.log(profile.photos[0].value);
+    console.log(profile.photos[0].value);
     User.findOne({ facebook: profile.id }, (error, user) => {
         if (error) {
             return done(error);
