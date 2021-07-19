@@ -55,6 +55,7 @@ app.use((request, response, next) => {
 require('./passport/facebook');
 //load google strategy
 require('./passport/google');
+require('./passport/local');
 
 //connect to mLab MongoDB
 mongoose.connect(process.env.MongoDB, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
@@ -174,11 +175,36 @@ app.post('/signup', (request, response) => {
                         email: request.body.email,
                         password: hash
                     }
-                    console.log(newUser);
+
+                    new User(newUser).save((error, user) => {
+                        if (error) {
+                            throw error;
+                        }
+                        if (user) {
+                            let success = [];
+                            success.push({ text: 'Account created successfully. You can login now' });
+                            response.render('home', {
+                                success: success
+                            });
+                        }
+                    })
                 }
             })
     }
 
+});
+
+app.post('/login', passport.authenticate('local', {
+    successRedirect: '/profile',
+    failureRedirect: 'loginErrors'
+}));
+
+app.get('/loginErrors', (request, response) => {
+    let errors = [];
+    errors.push({ text: 'User not found or Password incorrect' });
+    response.render('home', {
+        errors: errors
+    });
 });
 
 app.get('/logout', (request, response) => {
