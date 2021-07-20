@@ -14,6 +14,8 @@ passport.deserializeUser((id, done) => {
     });
 });
 
+
+
 passport.use(new FacebookStrategy({
     clientID: process.env.FacebookAppID,
     clientSecret: process.env.FacebookAppSecret,
@@ -33,8 +35,6 @@ passport.use(new FacebookStrategy({
                 fullname: profile.displayName,
                 firstname: profile.name.givenName,
                 lastname: profile.name.familyName,
-                image: `https://graph.facebook.com/{${profile.id}}/picture?type=large`,
-                //profile.photos[0].value,
                 email: profile.emails[0].value
             }
             new User(newUser).save((error, user) => {

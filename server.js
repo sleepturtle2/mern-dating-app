@@ -252,6 +252,8 @@ app.post('/contactUs', (request, response) => {
     });
 });
 
+console.log(process.env.NODE_ENV);
+
 app.listen(port, () => {
     console.log('Server is running on port ' + port);
 })
