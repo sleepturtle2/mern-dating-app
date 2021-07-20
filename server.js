@@ -74,7 +74,8 @@ app.set('view engine', 'handlebars');
 
 app.get('/', ensureGuest, (request, response) => {
     response.render('home', {
-        title: 'Home'
+        title: 'Home',
+        test: process.env.NODE_ENV
     });
 });
 
