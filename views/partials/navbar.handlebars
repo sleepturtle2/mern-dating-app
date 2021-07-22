@@ -9,6 +9,7 @@
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
+
       <li class="nav-item active">
         <a class="nav-link" href="/about">About<span class="sr-only">(current)</span></a>
       </li>
@@ -16,8 +17,13 @@
         <a class="nav-link" href="/contact">Contact</a>
       </li>
     {{#if user}}
+    <li class="nav-item">
+      <a class="nav-link" href="/profile">
+        <i class="fa fa-user">Profile</i></a>
+    </li>
       <li class="nav-item">
-        <a class="nav-link" href="/logout">Logout</a>
+        <a class="nav-link" href="/logout">
+        <i class="fa fa-sign-out">Logout</i></a>
       </li>
     {{/if}}
 

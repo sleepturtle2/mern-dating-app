@@ -74,8 +74,7 @@ app.set('view engine', 'handlebars');
 
 app.get('/', ensureGuest, (request, response) => {
     response.render('home', {
-        title: 'Home',
-        test: process.env.NODE_ENV
+        title: 'Home'
     });
 });
 
@@ -130,6 +129,34 @@ app.get('/profile', requireLogin, (request, response) => {
         }
     })
 })
+
+app.post('/updateProfile', requireLogin, (request, response) => {
+    User.findById({ _id: request.user._id })
+        .then((user) => {
+            user.fullname = request.body.fullname;
+            user.email = request.body.email;
+            user.gender = request.body.gender;
+            user.about = request.body.about;
+            user.save(() => {
+                response.redirect('/profile');
+            });
+        });
+});
+
+app.get('/askToDelete', (request, response) => {
+    response.render('askToDelete', {
+        title: 'Delete'
+    });
+});
+
+app.get('/deleteAccount', (request, response) => {
+    User.deleteOne({ _id: request.user._id })
+        .then(() => {
+            response.render('accountDeleted', {
+                title: 'Deleted'
+            });
+        });
+});
 
 app.get('/newAccount', (request, response) => {
     response.render('newAccount', {
@@ -253,7 +280,6 @@ app.post('/contactUs', (request, response) => {
     });
 });
 
-console.log(process.env.NODE_ENV);
 
 app.listen(port, () => {
     console.log('Server is running on port ' + port);

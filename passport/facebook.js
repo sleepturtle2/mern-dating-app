@@ -14,12 +14,18 @@ passport.deserializeUser((id, done) => {
     });
 });
 
+var callbackURL;
+
+if (process.env.NODE_ENV === 'production')
+    callbackURL = 'https://mern-dating.herokuapp.com/auth/facebook/callback';
+else if (process.env.NODE_ENV === 'development')
+    callbackURL = 'http://localhost:3000/auth/facebook/callback';
 
 
 passport.use(new FacebookStrategy({
     clientID: process.env.FacebookAppID,
     clientSecret: process.env.FacebookAppSecret,
-    callbackURL: 'https://mern-dating.herokuapp.com/auth/facebook/callback',
+    callbackURL: callbackURL,
     profileFields: ['email', 'name', 'displayName', 'photos']
 }, (accessToken, refreshToken, profile, done) => {
     console.log(profile.photos[0].value);

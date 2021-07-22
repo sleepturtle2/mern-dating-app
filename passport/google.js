@@ -12,10 +12,16 @@ passport.deserializeUser((id, done) => {
     });
 });
 
+if (process.env.NODE_ENV === 'production')
+    callbackURL = 'https://mern-dating.herokuapp.com/auth/google/callback';
+else if (process.env.NODE_ENV === 'development')
+    callbackURL = 'http://localhost:3000/auth/google/callback';
+
+
 passport.use(new GoogleStrategy({
     clientID: process.env.GoogleClientID,
     clientSecret: process.env.GoogleClientSecret,
-    callbackURL: 'https://mern-dating.herokuapp.com/auth/google/callback'
+    callbackURL: callbackURL,
 }, (accessToken, refreshToken, profile, done) => {
     console.log(profile);
     User.findOne({ google: profile.id }, (error, user) => {
@@ -28,9 +34,9 @@ passport.use(new GoogleStrategy({
             const newUser = {
                 firstname: profile.name.givenName,
                 lastname: profile.name.familyName,
-                image: profile.photos[0].value.substring(0, profile.photos[0].value.indexOf('?')),
                 fullname: profile.displayName,
-                google: profile.id
+                google: profile.id,
+                image: ''
             }
             new User(newUser).save((error, user) => {
                 if (error) {
