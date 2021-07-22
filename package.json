@@ -29,6 +29,7 @@
         "express-session": "^1.17.2",
         "handlebars": "^4.7.7",
         "https": "^1.0.0",
+        "moment": "^2.29.1",
         "mongodb": "^3.6.10",
         "mongoose": "^5.13.3",
         "passport": "^0.4.1",

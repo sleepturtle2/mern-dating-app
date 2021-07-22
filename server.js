@@ -23,7 +23,7 @@ app.use(express.json());
 
 //load helpers
 const { requireLogin, ensureGuest } = require('./helpers/auth');
-
+const { getLastMoment } = require('./helpers/moment');
 //configuration for authentication
 app.use(cookieParser());
 app.use(session({
@@ -70,7 +70,12 @@ const port = process.env.PORT || 3000;
 
 /*allowInsecurePrototypeAccess has been added to revert back to a version after handlebars updates*/
 //setup view engine
-app.engine('handlebars', hbs({ handlebars: allowInsecurePrototypeAccess(Handlebars) }));
+app.engine('handlebars', hbs({
+    handlebars: allowInsecurePrototypeAccess(Handlebars),
+    helpers: {
+        getLastMoment: getLastMoment
+    }
+}));
 app.set('view engine', 'handlebars');
 
 app.get('/', ensureGuest, (request, response) => {
@@ -319,6 +324,7 @@ app.get('/startChat/:id', requireLogin, (request, response) => {
 //Display Chat Room
 app.get('/chat/:id', requireLogin, (request, response) => {
     Chat.findById({ _id: request.params.id })
+        .sort({ date: 'desc' })
         .populate('sender')
         .populate('receiver')
         .populate('chats.senderName')
@@ -337,12 +343,14 @@ app.get('/chat/:id', requireLogin, (request, response) => {
 
 app.post('/chat/:id', requireLogin, (request, response) => {
     Chat.findOne({ _id: request.params.id, sender: request.user._id })
+        .sort({ date: 'desc' })
         .populate('sender')
         .populate('receiver')
         .populate('chats.senderName')
         .populate('chats.receiverName')
         .then((chat) => {
             if (chat) {
+                //sender sends message here
                 chat.senderRead = true;
                 chat.receiverRead = false;
                 chat.date = new Date();
@@ -363,6 +371,7 @@ app.post('/chat/:id', requireLogin, (request, response) => {
                     }
                     if (chat) {
                         Chat.findOne({ _id: chat._id })
+                            .sort({ date: 'desc' })
                             .populate('sender')
                             .populate('receiver')
                             .populate('chats.senderName')
@@ -387,63 +396,69 @@ app.post('/chat/:id', requireLogin, (request, response) => {
                                     })
                             })
 
-                    } else {
-                        Chat.findOne({ _id: request.params.id, receiver: request.user._id })
-                            .populate('sender')
-                            .populate('receiver')
-                            .populate('chats.senderName')
-                            .populate('chats.receiverName')
-                            .then((chat) => {
-                                chat.senderRead = true;
-                                chat.receiverRead = false;
-                                chat.date = new Date();
-
-                                const newChat = {
-                                    senderName: chat.sender._id,
-                                    senderRead: false,
-                                    receiverName: request.user._id,
-                                    receiverRead: true,
-                                    receiverMessage: request.body.chat,
-                                    date: new Date()
-                                }
-
-                                chat.chats.push(newChat)
-                                chat.save((error, chat) => {
-                                    if (error) {
-                                        throw error;
-                                    }
-                                    if (chat) {
-                                        Chat.findOne({ _id: chat._id })
-                                            .populate('sender')
-                                            .populate('receiver')
-                                            .populate('chats.senderName')
-                                            .populate('chats.receiverName')
-                                            .then((chat) => {
-                                                User.findById({ _id: request.user._id })
-                                                    .then((user) => {
-                                                        user.wallet = user.wallet - 1;
-                                                        user.save((error, user) => {
-                                                            if (error) {
-                                                                throw error;
-                                                            }
-                                                            if (user) {
-                                                                response.render('chatRoom', {
-                                                                    title: 'Chat',
-                                                                    user: user,
-                                                                    chat: chat
-                                                                })
-                                                            }
-                                                        })
-                                                    })
-                                            })
-                                    }
-                                })
-                            })
                     }
                 })
+
+            } else {
+                //receiver sends message back
+                Chat.findOne({ _id: request.params.id, receiver: request.user._id })
+                    .sort({ date: 'desc' })
+                    .populate('sender')
+                    .populate('receiver')
+                    .populate('chats.senderName')
+                    .populate('chats.receiverName')
+                    .then((chat) => {
+                        chat.senderRead = true;
+                        chat.receiverRead = false;
+                        chat.date = new Date();
+
+                        const newChat = {
+                            senderName: chat.sender._id,
+                            senderRead: false,
+                            receiverName: request.user._id,
+                            receiverRead: true,
+                            receiverMessage: request.body.chat,
+                            date: new Date()
+                        }
+
+                        chat.chats.push(newChat)
+                        chat.save((error, chat) => {
+                            if (error) {
+                                throw error;
+                            }
+                            if (chat) {
+                                Chat.findOne({ _id: chat._id })
+                                    .sort({ date: 'desc' })
+                                    .populate('sender')
+                                    .populate('receiver')
+                                    .populate('chats.senderName')
+                                    .populate('chats.receiverName')
+                                    .then((chat) => {
+                                        User.findById({ _id: request.user._id })
+                                            .then((user) => {
+                                                user.wallet = user.wallet - 1;
+                                                user.save((error, user) => {
+                                                    if (error) {
+                                                        throw error;
+                                                    }
+                                                    if (user) {
+                                                        response.render('chatRoom', {
+                                                            title: 'Chat',
+                                                            user: user,
+                                                            chat: chat
+                                                        })
+                                                    }
+                                                })
+                                            })
+                                    })
+                            }
+                        })
+                    })
             }
+
         })
 })
+
 
 app.get('/logout', (request, response) => {
     User.findById({ _id: request.user._id }).then((user) => {
