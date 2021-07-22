@@ -10,11 +10,11 @@ const chatSchema = new Schema({
         type: Boolean,
         default: false
     },
-    received: {
+    receiver: {
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    receivedRead: {
+    receiverRead: {
         type: Boolean,
         default: false
     },

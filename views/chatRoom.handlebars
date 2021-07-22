@@ -5,20 +5,53 @@
     {{else}}
     <img src="/images/default-user.png" alt="" class="chatroom-users rounded-circle">
     {{/if}}
+    <small>{{chat.sender.fullname}}</small>
 
-    {{#if receiver.sender.image}}
-    <img src="{{receiver.sender.image}}" alt="" class="chatroom-users">
+    {{#if chat.receiver.image}}
+    <img src="{{chat.receiver.image}}" alt="" class="chatroom-users">
     {{else}}
     <img src="/images/default-user.png" alt="" class="chatroom-users">
     {{/if}}
+    <small>You</small>
   </h4>
 
-  
-  <div class="media">
-    <img src="" class="mr-3" alt="">
-    <div class="media-body">
-      <h5 class="mt-0">Media Heading</h5>
-      Lorem ipsum dolor, sit amet consectetur adipisicing elit. Culpa saepe cumque laborum exercitationem porro, laudantium architecto ex ipsam deleniti hic dolor impedit, in possimus numquam eos voluptas? Pariatur, quo nihil!
+    <div id="messages">
+      {{#each chat}}
+      {{#each chats}}
+      {{#if senderMessage}}
+      <div class="media">
+        <img src="{{senderName.image}}" class="mr-3 chatroom-users rounded-circle" alt="">
+        <div class="media-body">
+          <h5 class="mt-0">{{senderMessage}}</h5>
+          <small>{{date}}</small>
+        </div>
+      </div>
+      {{/if}}
+      {{/each}}
+      {{/each}}
+
+      <hr>
+
+      {{#each chat}}
+      {{#each chats}}
+      {{#if receiverMessage}}
+      <div class="media">
+        <img src="{{receiverName.image}}" class="mr-3 chatroom-users rounded-circle" alt="">
+        <div class="media-body">
+          <h5 class="mt-0">{{receiverMessage}}</h5>
+          <small>{{date}}</small>
+        </div>
+      </div>
+      {{/if}}
+      {{/each}}
+      {{/each}}
     </div>
-  </div>
+
+  <form action="/chat/{{chat._id}}" method="POST">
+  <input class="form-control" type="text" name="chat" placeholder="Type message..">
+  <br>
+  <button class="btn btn-primary">Send</button>
+
+  </form>
+
 </div>

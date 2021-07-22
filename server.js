@@ -280,6 +280,7 @@ app.get('/startChat/:id', requireLogin, (request, response) => {
             } else {
                 Chat.findOne({ sender: request.user._id, receiver: request.params.id })
                     .then((chat) => {
+
                         if (chat) {
                             chat.senderRead = true;
                             chat.receiverRead = false;
@@ -331,6 +332,116 @@ app.get('/chat/:id', requireLogin, (request, response) => {
                         chat: chat
                     })
                 })
+        })
+})
+
+app.post('/chat/:id', requireLogin, (request, response) => {
+    Chat.findOne({ _id: request.params.id, sender: request.user._id })
+        .populate('sender')
+        .populate('receiver')
+        .populate('chats.senderName')
+        .populate('chats.receiverName')
+        .then((chat) => {
+            if (chat) {
+                chat.senderRead = true;
+                chat.receiverRead = false;
+                chat.date = new Date();
+
+                const newChat = {
+                    senderName: request.user._id,
+                    senderRead: true,
+                    receiverName: chat.receiver._id,
+                    receiverRead: false,
+                    date: new Date(),
+                    senderMessage: request.body.chat
+                }
+
+                chat.chats.push(newChat);
+                chat.save((error, chat) => {
+                    if (error) {
+                        throw error;
+                    }
+                    if (chat) {
+                        Chat.findOne({ _id: chat._id })
+                            .populate('sender')
+                            .populate('receiver')
+                            .populate('chats.senderName')
+                            .populate('chats.receiverName')
+                            .then((chat) => {
+                                User.findById({ _id: request.user._id })
+                                    .then((user) => {
+                                        //we will charge client for each message
+                                        user.wallet = user.wallet - 1;
+                                        user.save((error, user) => {
+                                            if (error) {
+                                                throw error;
+                                            }
+                                            if (user) {
+                                                response.render('chatRoom', {
+                                                    title: 'Chat',
+                                                    chat: chat,
+                                                    user: user
+                                                })
+                                            }
+                                        })
+                                    })
+                            })
+
+                    } else {
+                        Chat.findOne({ _id: request.params.id, receiver: request.user._id })
+                            .populate('sender')
+                            .populate('receiver')
+                            .populate('chats.senderName')
+                            .populate('chats.receiverName')
+                            .then((chat) => {
+                                chat.senderRead = true;
+                                chat.receiverRead = false;
+                                chat.date = new Date();
+
+                                const newChat = {
+                                    senderName: chat.sender._id,
+                                    senderRead: false,
+                                    receiverName: request.user._id,
+                                    receiverRead: true,
+                                    receiverMessage: request.body.chat,
+                                    date: new Date()
+                                }
+
+                                chat.chats.push(newChat)
+                                chat.save((error, chat) => {
+                                    if (error) {
+                                        throw error;
+                                    }
+                                    if (chat) {
+                                        Chat.findOne({ _id: chat._id })
+                                            .populate('sender')
+                                            .populate('receiver')
+                                            .populate('chats.senderName')
+                                            .populate('chats.receiverName')
+                                            .then((chat) => {
+                                                User.findById({ _id: request.user._id })
+                                                    .then((user) => {
+                                                        user.wallet = user.wallet - 1;
+                                                        user.save((error, user) => {
+                                                            if (error) {
+                                                                throw error;
+                                                            }
+                                                            if (user) {
+                                                                response.render('chatRoom', {
+                                                                    title: 'Chat',
+                                                                    user: user,
+                                                                    chat: chat
+                                                                })
+                                                            }
+                                                        })
+                                                    })
+                                            })
+                                    }
+                                })
+                            })
+                    }
+                })
+            }
         })
 })
 

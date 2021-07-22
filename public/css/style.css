@@ -39,3 +39,7 @@ h1 {
     width: 64px;
     height: 64px;
 }
+
+#messages {
+    height: 300px;
+}
