@@ -326,7 +326,7 @@ app.get('/chat/:id', requireLogin, (request, response) => {
             User.findOne({ _id: request.user._id })
                 .then((user) => {
                     response.render('chatRoom', {
-                        title: 'Chat',
+                        title: 'ChatRoom',
                         user: user,
                         chat: chat
                     })

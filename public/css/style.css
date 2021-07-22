@@ -34,3 +34,8 @@ h1 {
 .col-sm-3 {
     margin: 5px;
 }
+
+.chatroom-users {
+    width: 64px;
+    height: 64px;
+}
