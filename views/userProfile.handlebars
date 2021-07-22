@@ -1,0 +1,13 @@
+<div class="card" style="width: 18rem;">
+{{#if oneUser.image}}
+<img src="{{oneUser.image}}" width="100%" alt="">
+{{else}}
+<img src="/images/default-user.png" width="100%" alt="">
+{{/if}}
+  <div class="card-body">
+    <h5 class="card-title">{{oneUser.fullname}}</h5>
+    <small class="card-text">{{oneUser.gender}}</small>
+    <p class="card-text">{{oneUser.about}}</p>
+    <a href="/startChat/{{oneUser._id}}"  class="btn btn-primary">Send Message</a>
+  </div>
+</div>

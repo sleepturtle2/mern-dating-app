@@ -3,7 +3,8 @@
 <p>You are logged in..</p>
 {{else}}
 <div class="row">
-  <div class="col-sm-4">
+  <div class="col"></div>
+  <div class="col-sm-6">
     <h1 class="center">
       <a href="/auth/facebook"><button class="btn btn-primary">Login with Facebook</button></a>
     </h1>
@@ -22,6 +23,7 @@
     <p class="red">{{text}}</p>
     {{/each}}
       <div class="form-group">
+        <h2 class="center">Register</h2>
         <label for="email">Email</label>
         <input type="text" name="email" id="email" class="form-control">
       </div>
@@ -33,4 +35,5 @@
     </form>
     <a href="/newAccount">Need Account?</a>
   </div>
+  <div class="col"></div>
 {{/if}}

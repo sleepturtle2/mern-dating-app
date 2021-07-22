@@ -41,7 +41,8 @@ passport.use(new FacebookStrategy({
                 fullname: profile.displayName,
                 firstname: profile.name.givenName,
                 lastname: profile.name.familyName,
-                email: profile.emails[0].value
+                email: profile.emails[0].value,
+                image: '/images/default-user.png'
             }
             new User(newUser).save((error, user) => {
                 if (error) {

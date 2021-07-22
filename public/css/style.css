@@ -18,4 +18,19 @@ h1 {
 
 .fa-edit {
     cursor: pointer;
+    color: blue;
+    margin-right: 10px;
+}
+
+.fa-trash {
+    color: red;
+    margin-right: 10px;
+}
+
+.gray {
+    color: gray;
+}
+
+.col-sm-3 {
+    margin: 5px;
 }

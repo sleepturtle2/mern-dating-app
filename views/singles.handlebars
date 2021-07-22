@@ -1,0 +1,35 @@
+<div class="container-fluid">
+  {{#each singles}}
+  {{#if online}}
+  <a href="/userProfile/{{_id}}">
+    <div class="row">
+      <div class="col-sm-3">
+        {{#if image}}
+        <img src="{{image}}" class="rounded-circle" width="75px">
+        {{else}}
+        <img src="./images/default-user.png" class="rounded-circle" width="75px">
+        {{/if}}
+        <br>
+        <i class="fa fa-circle green"> online</i>
+      </div>
+    </div>
+  </a>
+
+  {{else}}
+  <a href="/userProfile/{{_id}}">
+    <div class="row">
+      <div class="col-sm-3">
+        {{#if image}}
+        <img src="{{image}}" class="rounded-circle" width="75px">
+        {{else}}
+        <img src="./images/default-user.png" class="rounded-circle" width="75px">
+        {{/if}}
+        <br>
+        <i class="fa fa-circle gray"> offline</i>
+      </div>
+    </div>
+  </a>
+  {{/if}}
+  {{/each}}
+
+</div>

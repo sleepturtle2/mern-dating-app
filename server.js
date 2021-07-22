@@ -13,6 +13,7 @@ const bcrypt = require('bcryptjs');
 //Load models
 const Message = require('./models/message');
 const User = require('./models/user');
+const Chat = require('./models/chat');
 
 const app = express();
 
@@ -143,13 +144,13 @@ app.post('/updateProfile', requireLogin, (request, response) => {
         });
 });
 
-app.get('/askToDelete', (request, response) => {
+app.get('/askToDelete', requireLogin, (request, response) => {
     response.render('askToDelete', {
         title: 'Delete'
     });
 });
 
-app.get('/deleteAccount', (request, response) => {
+app.get('/deleteAccount', requireLogin, (request, response) => {
     User.deleteOne({ _id: request.user._id })
         .then(() => {
             response.render('accountDeleted', {
@@ -222,6 +223,30 @@ app.post('/signup', (request, response) => {
 
 });
 
+//get route to handle users
+app.use('/singles', (request, response) => {
+    User.find({})
+        .sort({ date: 'desc' })
+        .then((singles) => {
+            response.render('singles', {
+                title: 'Singles',
+                singles: singles
+            })
+        }).catch((error) => {
+            console.log(error);
+        })
+})
+
+app.get('/userProfile/:id', (request, response) => {
+    User.findById({ _id: request.params.id })
+        .then((user) => {
+            response.render('userProfile', {
+                title: 'Profile',
+                oneUser: user
+            });
+        });
+});
+
 app.post('/login', passport.authenticate('local', {
     successRedirect: '/profile',
     failureRedirect: 'loginErrors'
@@ -234,6 +259,80 @@ app.get('/loginErrors', (request, response) => {
         errors: errors
     });
 });
+
+
+//start chat process
+app.get('/startChat/:id', requireLogin, (request, response) => {
+    Chat.findOne({ sender: request.params.id, receiver: request.user._id })
+        .then((chat) => {
+            if (chat) {
+                chat.receiverRead = true;
+                chat.senderRead = false;
+                chat.date = new Date();
+                chat.save((error, chat) => {
+                    if (error) {
+                        throw error;
+                    }
+                    if (chat) {
+                        response.redirect(`/chat/${chat._id}`)
+                    }
+                })
+            } else {
+                Chat.findOne({ sender: request.user._id, receiver: request.params.id })
+                    .then((chat) => {
+                        if (chat) {
+                            chat.senderRead = true;
+                            chat.receiverRead = false;
+                            chat.date = new Date();
+                            chat.save((error, chat) => {
+                                if (error) {
+                                    throw error;
+                                }
+                                if (chat) {
+                                    response.redirect(`/chat/${chat._id}`);
+                                }
+                            })
+                        } else {
+                            const newChat = {
+                                sender: request.user._id,
+                                receiver: request.params.id,
+                                senderRead: true,
+                                receiverRead: false,
+                                date: new Date()
+                            }
+
+                            new Chat(newChat).save((error, chat) => {
+                                if (error) {
+                                    throw error;
+                                }
+                                if (chat) {
+                                    response.redirect(`/chat/${chat._id}`)
+                                }
+                            })
+                        }
+                    })
+            }
+        })
+})
+
+//Display Chat Room
+app.get('/chat/:id', requireLogin, (request, response) => {
+    Chat.findById({ _id: request.params.id })
+        .populate('sender')
+        .populate('receiver')
+        .populate('chats.senderName')
+        .populate('chats.receiverName')
+        .then((chat) => {
+            User.findOne({ _id: request.user._id })
+                .then((user) => {
+                    response.render('chatRoom', {
+                        title: 'Chat',
+                        user: user,
+                        chat: chat
+                    })
+                })
+        })
+})
 
 app.get('/logout', (request, response) => {
     User.findById({ _id: request.user._id }).then((user) => {

@@ -50,6 +50,10 @@ const userSchema = new Schema({
     },
     password: {
         type: String
+    },
+    date: {
+        type: Date,
+        default: Date.now
     }
 });
 

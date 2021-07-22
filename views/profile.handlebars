@@ -1,7 +1,11 @@
 <div class="row">
   <div class="col-sm">
     <div class="card" style=" background-color:aquamarine; height: 200px; width: 200px;">
+      {{#if user.image}}
       <img src="{{user.image}}" class="card-img-top" alt="">
+      {{else}}
+      <img src="./images/default-user.png" class="card-img-top" alt="">
+      {{/if}}
 
     </div>
   </div>
@@ -13,8 +17,8 @@
       <p class="card-text"><i class="fa fa-id-card"> {{user.about}}</i></p>
       <hr>
       <h5 onclick="editProfile()">
-        <i class="fa fa-edit"> Edit Profile</i>
-        <a href="/askToDelete"><i class="fa fa-trash"> Delete Profile</i></a>
+        <i class="fa fa-edit"> Edit </i>
+        <a href="/askToDelete"><i class="fa fa-trash"> Delete </i></a>
         </h5>
 
 

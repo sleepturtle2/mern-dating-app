@@ -1,0 +1,22 @@
+<div class="container">
+  <h4 class="center">
+    {{#if chat.sender.image}}
+    <img src="{{chat.sender.image}}"  alt="" width="64px">
+    {{else}}
+    <img src="/images/default-user.png" alt="" width="64px">
+    {{/if}}
+
+    {{#if receiver.sender.image}}
+    <img src="{{receiver.sender.image}}" alt="" width="64px">
+    {{else}}
+    <img src="/images/default-user.png" alt="" width="64px">
+    {{/if}}
+  </h4>
+  <div class="media">
+    <img src="" class="mr-3" alt="">
+    <div class="media-body">
+      <h5 class="mt-0">Media Heading</h5>
+      Lorem ipsum dolor, sit amet consectetur adipisicing elit. Culpa saepe cumque laborum exercitationem porro, laudantium architecto ex ipsam deleniti hic dolor impedit, in possimus numquam eos voluptas? Pariatur, quo nihil!
+    </div>
+  </div>
+</div>
