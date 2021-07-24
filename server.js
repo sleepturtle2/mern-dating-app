@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const flash = require('connect-flash');
 const bcrypt = require('bcryptjs');
+const formidable = require('formidable');
 
 //Load models
 const Message = require('./models/message');
@@ -24,6 +25,7 @@ app.use(express.json());
 //load helpers
 const { requireLogin, ensureGuest } = require('./helpers/auth');
 const { getLastMoment } = require('./helpers/moment');
+const { uploadImage } = require('./helpers/aws');
 //configuration for authentication
 app.use(cookieParser());
 app.use(session({
@@ -459,6 +461,40 @@ app.post('/chat/:id', requireLogin, (request, response) => {
         })
 })
 
+//handle get route
+app.get('/uploadImage', (request, response) => {
+    response.render('uploadImage', {
+        title: 'Upload'
+    })
+})
+
+app.post('/uploadAvatar', (request, response) => {
+    User.findById({ _id: request.user._id })
+        .then((user) => {
+            user.image = `https://s3.amazonaws.com/online-dating-app/${request.body.upload}`;
+            user.save((error) => {
+                if (error) {
+                    throw error;
+                } else {
+                    response.redirect('/profile');
+                }
+            })
+        })
+})
+
+app.post('/uploadFile', uploadImage.any(), (request, response) => {
+    const form = new formidable.incomingForm();
+    form.on('file', (field, file) => {
+        console.log(file);
+    });
+    form.on('error', (error) => {
+        console.log(error);
+    });
+    form.on('end', () => {
+        console.log('Image upload is successful');
+    });
+    form.parse(request);
+});
 
 app.get('/logout', (request, response) => {
     User.findById({ _id: request.user._id }).then((user) => {
