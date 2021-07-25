@@ -462,13 +462,13 @@ app.post('/chat/:id', requireLogin, (request, response) => {
 })
 
 //handle get route
-app.get('/uploadImage', (request, response) => {
+app.get('/uploadImage', requireLogin, (request, response) => {
     response.render('uploadImage', {
         title: 'Upload'
     })
 })
 
-app.post('/uploadAvatar', (request, response) => {
+app.post('/uploadAvatar', requireLogin, (request, response) => {
     console.log(request.user);
     console.log(request.body.upload);
     User.findById({ _id: request.user._id })
