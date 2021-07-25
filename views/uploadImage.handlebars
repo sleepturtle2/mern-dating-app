@@ -2,9 +2,9 @@
   <h1 id="spinner" style="display:none">
     Please wait ..
   </h1>
-  <form action="/uploadAvatar" method="POST" id="uploadForm" enctype="multipart/form-data">
+  <form action="/uploadAvatar" method="POST" id="uploadForm">
     <div class="form-group">
-      <button class="btn btn-success upload-btn" type="button">Choose Image</button>
+      <button class="btn btn-success upload-btn" type="button" onClick="openFileInput()">Choose Image</button>
       <input type="file" name="upload" id="upload-input" style="display:none">
     </div>
     <div class="form-group">
@@ -19,7 +19,12 @@
     document.getElementById('uploadForm').style.display = 'none';
     document.getElementById('spinner').style.display = 'block';
     setTimeout(function(){
-      document.getElementId('uploadForm').submit();
-    }, 7000)
+      document.getElementById('uploadForm').submit();
+    }, 1000)
+  }
+
+  function openFileInput(){
+    let fileInput = document.getElementById('upload-input');
+    fileInput.click();
   }
 </script>

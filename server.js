@@ -469,9 +469,11 @@ app.get('/uploadImage', (request, response) => {
 })
 
 app.post('/uploadAvatar', (request, response) => {
+    console.log(request.user);
+    console.log(request.body.upload);
     User.findById({ _id: request.user._id })
         .then((user) => {
-            user.image = `https://s3.amazonaws.com/online-dating-app/${request.body.upload}`;
+            user.image = `https://sleepturtle-dating-app.s3.us-east-2.amazonaws.com/${request.body.upload}`;
             user.save((error) => {
                 if (error) {
                     throw error;
@@ -483,7 +485,7 @@ app.post('/uploadAvatar', (request, response) => {
 })
 
 app.post('/uploadFile', uploadImage.any(), (request, response) => {
-    const form = new formidable.incomingForm();
+    const form = formidable({ multiples: true });
     form.on('file', (field, file) => {
         console.log(file);
     });
