@@ -1,8 +1,8 @@
 <div class="container-fluid">
   {{#each singles}}
   {{#if online}}
-
-    <div class="row">
+<a href="/userProfile/{{_id}}">
+    <div class="row" >
       <div class="col-sm-3">
         {{#if image}}
         <img src="{{image}}" class="rounded-circle" width="25%">
@@ -12,12 +12,13 @@
         <br>
         <i class="fa fa-circle green"> online</i>
       </div>
-    </div>
-  
+    </div></a>
+    <hr>
+
 
   {{else}}
   <a href="/userProfile/{{_id}}">
-    <div class="row">
+    <div class="row" >
       <div class="col-sm-3">
         {{#if image}}
         <img src="{{image}}" class="rounded-circle" width="25%">
@@ -29,6 +30,7 @@
       </div>
     </div>
   </a>
+  <hr>
   {{/if}}
   {{/each}}
 
