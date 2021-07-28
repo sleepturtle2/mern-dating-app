@@ -1,63 +1,61 @@
 <div class="container">
   <h4 class="center">
     <a href="/userProfile/{{chat.sender._id}}">
-    {{#if chat.sender.image}}
-    <img src="{{chat.sender.image}}"  alt="" class="chatroom-users rounded-circle">
-    {{else}}
-    <img src="/images/default-user.png" alt="" class="chatroom-users rounded-circle">
-    {{/if}}
-    <small>{{chat.sender.fullname}}</small>
-</a>
-  <a href="/userProfile/{{chat.receiver._id}}">
-    {{#if chat.receiver.image}}
-    <img src="{{chat.receiver.image}}" alt="" class="chatroom-users">
-    {{else}}
-    <img src="/images/default-user.png" alt="" class="chatroom-users">
-    {{/if}}
-    <small>{{chat.receiver.fullname}}</small>
+      {{#if chat.sender.image}}
+      <img src="{{chat.sender.image}}" alt="" class="chatroom-users rounded-circle">
+      {{else}}
+      <img src="/images/default-user.png" alt="" class="chatroom-users rounded-circle">
+      {{/if}}
+      <small>{{chat.sender.fullname}}</small>
+    </a>
+    <a href="/userProfile/{{chat.receiver._id}}">
+      {{#if chat.receiver.image}}
+      <img src="{{chat.receiver.image}}" alt="" class="chatroom-users">
+      {{else}}
+      <img src="/images/default-user.png" alt="" class="chatroom-users">
+      {{/if}}
+      <small>{{chat.receiver.fullname}}</small>
     </a>
   </h4>
 
-    <div id="messages">
-      {{#each chat}}
-      {{#each chats}}
-      {{#if senderMessage}}
-      <div class="media">
-        <a href="/userProfile/{{senderName._id}}">
+  <div id="messages">
+    {{#each chat}}
+    {{#each chats}}
+    {{#if senderMessage}}
+    <div class="media">
+      <a href="/userProfile/{{senderName._id}}">
         <img src="{{senderName.image}}" class="mr-3 chatroom-users rounded-circle" alt="">
-        </a>
-        <div class="media-body">
-          <h5 class="mt-0">{{senderMessage}}</h5>
-          <small>{{getLastMoment date 'hour'}}</small>
-        </div>
+      </a>
+      <div class="media-body">
+        <h5 class="mt-0">{{senderMessage}}</h5>
+        <small>{{getLastMoment date 'hour'}}</small>
       </div>
-          <hr>
-      {{/if}}
-      {{/each}}
-      {{/each}}
-      {{#each chat}}
-      {{#each chats}}
-      {{#if receiverMessage}}
-      <div class="media">
-        <a href="/userProfile/{{receiverName._id}}">
-        <img src="{{receiverName.image}}" class="mr-3 chatroom-users rounded-circle" alt="">
-        </a>
-        <div class="media-body">
-          <h5 class="mt-0">{{receiverMessage}}</h5>
-          <small>{{getLastMoment date 'hour'}}</small>
-          <small>{{receiverName.fullname}}</small>
-        </div>
-      </div>
-      <hr>
-      {{/if}}
-      {{/each}}
-      {{/each}}
     </div>
+    <hr>
+    {{/if}}
+    {{#if receiverMessage}}
+    <div class="media">
+      <a href="/userProfile/{{receiverName._id}}">
+        <img src="{{receiverName.image}}" class="mr-3 chatroom-users rounded-circle" alt="">
+      </a>
+      <div class="media-body">
+        <h5 class="mt-0">{{receiverMessage}}</h5>
+        <small>{{getLastMoment date 'hour'}}</small>
+        <small>{{receiverName.fullname}}</small>
+      </div>
+    </div>
+    <hr>
+    {{/if}}
+
+    {{/each}}
+    {{/each}}
+
+  </div>
 
   <form action="/chat/{{chat._id}}" method="POST">
-  <input class="form-control" type="text" name="chat" placeholder="Type message..">
-  <br>
-  <button class="btn btn-primary">Send</button>
+    <input class="form-control" type="text" name="chat" placeholder="Type message..">
+    <br>
+    <button class="btn btn-primary">Send</button>
 
   </form>
 

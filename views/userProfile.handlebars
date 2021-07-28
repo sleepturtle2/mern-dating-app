@@ -8,6 +8,18 @@
     <h5 class="card-title">{{oneUser.fullname}}</h5>
     <small class="card-text">{{oneUser.gender}}</small>
     <p class="card-text">{{oneUser.about}}</p>
-    <a href="/startChat/{{oneUser._id}}"  class="btn btn-primary">Send Message</a>
+    <a href="/startChat/{{oneUser._id}}"  class="btn btn-primary">
+      <i class="fa fa-commenting"></i>
+    </a>
+
+    {{#if smile}}
+    <a href="/deleteSmile/{{oneUser._id}}" class="btn btn-danger">
+      <i class="fa fa-smile-o"></i>
+    </a>
+    {{else}}
+    <a href="/sendSmile/{{oneUser._id}}" class="btn btn-outline-danger">
+      <i class="fa fa-smile-o"></i>
+    </a>
+    {{/if}}
   </div>
 </div>

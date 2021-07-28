@@ -1,6 +1,52 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="/">Dating App</a>
+<nav class="navbar navbar-dark bg-dark fixed-top">
+  <a class="navbar-brand" href="/">
+    <img src="/images/sleepturtle.png" width="30" height="30">
+  </a>
+  {{#if newSmile}}
+  <a href="/showSmile/{{newSmile._id}}">
+    <i id="smile" class="fa fa-smile-o"></i>
+  </a>
+  <style>
+    #smile {
+      font-size: 35px;
+      color: white;
+      border-radius: 50%;
+    }
+  </style>
+  <script>
+    const smile = document.getElementById('smile');
+    setInterval(function () {
+      smile.style.color = "#d9534f";
+
+    }, 1000);
+
+    setInterval(function () {
+      smile.style.color = "white";
+    }, 2000);
+  </script>
+  {{else}}
   <a class="navbar-brand" href="#"> {{title}} </a>
+  {{/if}}
+
+  {{#if unread}}
+
+  <a href="/chats" class="navbar-brand">
+    <i class="fa fa-envelope-o" id="letter" style="font-size: 35px; "></i>
+  </a>
+
+  <script>
+    const letter = document.getElementById('letter');
+
+    setInterval(function () {
+      letter.style.color = "green";
+    }, 1000);
+
+    setInterval(function () {
+      letter.style.color = "yellow";
+    }, 2000)
+  </script>
+
+  {{/if}}
 
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
     aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -16,21 +62,28 @@
       <li class="nav-item">
         <a class="nav-link" href="/contact">Contact</a>
       </li>
-    {{#if user}}
-    <li class="nav-item">
-      <a class="nav-link" href="/singles">
-        <i class="fa fa-users">Singles</i></a>
-    </li>
+      {{#if user}}
+      <li class="nav-item">
+        <a class="nav-link" href="/singles">
+          <i class="fa fa-users">Singles</i></a>
+      </li>
 
-    <li class="nav-item">
-      <a class="nav-link" href="/profile">
-        <i class="fa fa-user">Profile</i></a>
-    </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/profile">
+          <i class="fa fa-user">Profile</i></a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="/chats">
+          <i class="fa fa-commenting">Chat</i></a>
+      </li>
+
+
       <li class="nav-item">
         <a class="nav-link" href="/logout">
-        <i class="fa fa-sign-out">Logout</i></a>
+          <i class="fa fa-sign-out">Logout</i></a>
       </li>
-    {{/if}}
+      {{/if}}
 
 
     </ul>

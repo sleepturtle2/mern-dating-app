@@ -1,37 +1,61 @@
 <div class="container-fluid">
-  {{#each singles}}
-  {{#if online}}
-<a href="/userProfile/{{_id}}">
-    <div class="row" >
-      <div class="col-sm-3">
-        {{#if image}}
-        <img src="{{image}}" class="rounded-circle" width="25%">
-        {{else}}
-        <img src="./images/default-user.png" class="rounded-circle" width="75px">
-        {{/if}}
-        <br>
-        <i class="fa fa-circle green"> online</i>
-      </div>
-    </div></a>
-    <hr>
+  <div class="row">
 
 
-  {{else}}
-  <a href="/userProfile/{{_id}}">
-    <div class="row" >
-      <div class="col-sm-3">
-        {{#if image}}
-        <img src="{{image}}" class="rounded-circle" width="25%">
-        {{else}}
-        <img src="./images/default-user.png" class="rounded-circle" width="75px">
-        {{/if}}
-        <br>
-        <i class="fa fa-circle gray"> offline</i>
-      </div>
+    {{#each singles}}
+    {{#if online}}
+
+
+    <div class="col-sm-3">
+      {{#if image}}
+      <img src="{{image}}" class="img-fluid mb-2">
+      {{else}}
+      <img src="./images/default-user.png" class="img-fluid mb-2">
+      {{/if}}
+      <br>
+      <h4 class="singles-icons">
+        <a href="/userProfile/{{_id}}">
+          <buttton class="btn btn-outline-primary"><i class="fa fa-address-book"></i></buttton>
+        </a>
+        <a href="/startChat/{{_id}}">
+          <button class="btn btn-outline-info"><i class="fa fa-commenting"></i></button>
+        </a>
+        <a href="/sendSmile/{{_id}}">
+          <button class="btn btn-outline-danger"><i class="fa fa-smile-o"></i></button>
+        </a>
+        <i class="fa fa-circle green right"></i>
+      </h4>
+
     </div>
-  </a>
-  <hr>
-  {{/if}}
-  {{/each}}
 
+
+
+
+    {{else}}
+
+
+    <div class="col-sm-3">
+      {{#if image}}
+      <img src="{{image}}" class="img-fluid mb-2" {{else}} <img src="./images/default-user.png" class="img-fluid mb-2">
+      {{/if}}
+      <br>
+      <h4 class="singles-icons">
+        <a href="/userProfile/{{_id}}">
+          <button class="btn btn-primary-info"><i class="fa fa-address-book"></i></button>
+        </a>
+        <a href="/startChat/{{_id}}">
+          <button class="btn-btn-outline-info"><i class="fa fa-commenting"></i></button>
+        </a>
+        <a href="/sendSmile/{{_id}}">
+          <button class="btn btn-outline-danger"><i class="fa fa-smile-o"></i></button>
+        </a>
+        <i class="fa fa-circle gray right"> </i>
+      </h4>
+
+    </div>
+
+
+    {{/if}}
+    {{/each}}
+  </div>
 </div>

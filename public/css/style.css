@@ -33,6 +33,8 @@ h1 {
 
 .col-sm-3 {
     margin: 5px;
+    border-bottom: 1px solid lightgrey;
+    padding: 5px;
 }
 
 .chatroom-users {
@@ -43,4 +45,17 @@ h1 {
 #messages {
     height: 300px;
     overflow-y: scroll;
+}
+
+.right {
+    float: right;
+}
+
+.singles-icons {
+    margin-top: 5px;
+}
+
+#main-body {
+    margin-top: 5em;
+    margin-bottom: 5em;
 }

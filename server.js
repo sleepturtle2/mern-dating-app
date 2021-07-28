@@ -11,10 +11,17 @@ const flash = require('connect-flash');
 const bcrypt = require('bcryptjs');
 const formidable = require('formidable');
 
+
+//load stripe module
+const stripe = require('stripe')(process.env.StripeSecretKey);
+
+
 //Load models
 const Message = require('./models/message');
 const User = require('./models/user');
 const Chat = require('./models/chat');
+const Smile = require('./models/smile');
+
 
 const app = express();
 
@@ -26,6 +33,9 @@ app.use(express.json());
 const { requireLogin, ensureGuest } = require('./helpers/auth');
 const { getLastMoment } = require('./helpers/moment');
 const { uploadImage } = require('./helpers/aws');
+const { walletChecker } = require('./helpers/wallet');
+
+
 //configuration for authentication
 app.use(cookieParser());
 app.use(session({
@@ -118,7 +128,9 @@ app.get('/auth/google/callback', passport.authenticate('google', {
     failureRedirect: '/'
 }));
 
-app.get('/profile', requireLogin, (request, response) => {
+
+//requireLogin here
+app.get('/profile', (request, response) => {
     User.findById({ _id: request.user._id }).then((user) => {
 
         if (user) {
@@ -128,17 +140,34 @@ app.get('/profile', requireLogin, (request, response) => {
                 if (error) {
                     throw error;
                 } else {
-                    response.render('profile', {
-                        title: 'Profile',
-                        user: user
-                    });
+                    Smile.findOne({ receiver: request.user._id, receiverReceived: false })
+                        .then((newSmile) => {
+                            Chat.findOne({
+                                    $or: [
+                                        { receiver: request.user._id, receiverRead: false },
+                                        { sender: request.user._id, senderRead: false }
+                                    ]
+                                })
+                                .then((unread) => {
+                                    response.render('profile', {
+                                        title: 'Profile',
+                                        user: user,
+                                        newSmile: newSmile,
+                                        unread: unread
+                                    })
+
+                                })
+
+                        })
                 }
             })
         }
     })
 })
 
-app.post('/updateProfile', requireLogin, (request, response) => {
+
+//requireLogin here
+app.post('/updateProfile', (request, response) => {
     User.findById({ _id: request.user._id })
         .then((user) => {
             user.fullname = request.body.fullname;
@@ -151,13 +180,17 @@ app.post('/updateProfile', requireLogin, (request, response) => {
         });
 });
 
-app.get('/askToDelete', requireLogin, (request, response) => {
+
+//requireLogin here
+app.get('/askToDelete', (request, response) => {
     response.render('askToDelete', {
         title: 'Delete'
     });
 });
 
-app.get('/deleteAccount', requireLogin, (request, response) => {
+
+//requireLogin here
+app.get('/deleteAccount', (request, response) => {
     User.deleteOne({ _id: request.user._id })
         .then(() => {
             response.render('accountDeleted', {
@@ -166,11 +199,15 @@ app.get('/deleteAccount', requireLogin, (request, response) => {
         });
 });
 
+
+
 app.get('/newAccount', (request, response) => {
     response.render('newAccount', {
         title: 'Signup'
     });
 });
+
+
 
 
 app.post('/signup', (request, response) => {
@@ -230,6 +267,8 @@ app.post('/signup', (request, response) => {
 
 });
 
+
+
 //get route to handle users
 app.use('/singles', (request, response) => {
     User.find({})
@@ -244,15 +283,22 @@ app.use('/singles', (request, response) => {
         })
 })
 
+
+
 app.get('/userProfile/:id', (request, response) => {
     User.findById({ _id: request.params.id })
         .then((user) => {
-            response.render('userProfile', {
-                title: 'Profile',
-                oneUser: user
-            });
+            Smile.findOne({ receiver: request.params.id })
+                .then((smile) => {
+                    response.render('userProfile', {
+                        title: 'Profile',
+                        oneUser: user,
+                        smile: smile
+                    });
+                });
         });
 });
+
 
 app.post('/login', passport.authenticate('local', {
     successRedirect: '/profile',
@@ -268,8 +314,10 @@ app.get('/loginErrors', (request, response) => {
 });
 
 
+
 //start chat process
-app.get('/startChat/:id', requireLogin, (request, response) => {
+//requireLogin here
+app.get('/startChat/:id', (request, response) => {
     Chat.findOne({ sender: request.params.id, receiver: request.user._id })
         .then((chat) => {
             if (chat) {
@@ -324,7 +372,8 @@ app.get('/startChat/:id', requireLogin, (request, response) => {
 })
 
 //Display Chat Room
-app.get('/chat/:id', requireLogin, (request, response) => {
+//requireLogin here
+app.get('/chat/:id', (request, response) => {
     Chat.findById({ _id: request.params.id })
         .sort({ date: 'desc' })
         .populate('sender')
@@ -343,7 +392,9 @@ app.get('/chat/:id', requireLogin, (request, response) => {
         })
 })
 
-app.post('/chat/:id', requireLogin, (request, response) => {
+
+//requireLogin here
+app.post('/chat/:id', walletChecker, (request, response) => {
     Chat.findOne({ _id: request.params.id, sender: request.user._id })
         .sort({ date: 'desc' })
         .populate('sender')
@@ -461,14 +512,18 @@ app.post('/chat/:id', requireLogin, (request, response) => {
         })
 })
 
+
+//requireLogin here
 //handle get route
-app.get('/uploadImage', requireLogin, (request, response) => {
+app.get('/uploadImage', (request, response) => {
     response.render('uploadImage', {
         title: 'Upload'
     })
 })
 
-app.post('/uploadAvatar', requireLogin, (request, response) => {
+
+//requireLogin here
+app.post('/uploadAvatar', (request, response) => {
     console.log(request.user);
     console.log(request.body.upload);
     User.findById({ _id: request.user._id })
@@ -484,6 +539,8 @@ app.post('/uploadAvatar', requireLogin, (request, response) => {
         })
 })
 
+
+
 app.post('/uploadFile', uploadImage.any(), (request, response) => {
     const form = formidable({ multiples: true });
     form.on('file', (field, file) => {
@@ -497,6 +554,143 @@ app.post('/uploadFile', uploadImage.any(), (request, response) => {
     });
     form.parse(request);
 });
+
+
+//requireLogin here
+app.get('/chats', (request, response) => {
+    Chat.find({ receiver: request.user._id })
+        .populate('sender')
+        .populate('receiver')
+        .populate('chats.senderName')
+        .populate('chats.receiverName')
+        .sort({ date: 'desc' })
+        .then((received) => {
+            Chat.find({ sender: request.user._id })
+                .populate('sender')
+                .populate('receiver')
+                .populate('chats.senderName')
+                .populate('chats.receiverName')
+                .sort({ date: 'desc' })
+                .then((sent) => {
+                    response.render('chat/chats', {
+                        title: 'Chat History',
+                        received: received,
+                        sent: sent
+                    })
+                })
+        })
+})
+
+
+//charge client
+//requireLogin
+app.post('/charge10dollars', (request, response) => {
+    console.log(request.body);
+    const amount = 1000;
+    stripe.customers.create({
+            email: request.body.stripeEmail,
+            source: request.body.stripeToken
+        })
+        .then((customer) => {
+            stripe.charges.create({
+
+                amount: amount,
+                description: '$10 for 20 messages',
+                currency: 'usd',
+                customer: customer.id,
+                receipt_email: customer.email,
+                shipping: {
+                    address: {
+                        city: "ontario",
+                        country: "canada",
+                        line1: "mandir gate",
+                        line2: "narendrapur",
+                        postal_code: "m5m1j4",
+                        state: "toronto"
+                    },
+                    name: "Sayantan Mukherjee"
+                }
+            }).then((charge) => {
+                User.findById({ _id: request.user._id })
+                    .then((user) => {
+                        user.wallet += 20;
+                        user.save()
+                            .then(() => {
+                                response.render('success', {
+                                    title: 'Success',
+                                    charge: charge
+                                })
+                            })
+                    })
+            }).catch((error) => {
+                console.log(error);
+            })
+        }).catch((error) => {
+            console.log(error);
+        })
+})
+
+//delete chat
+//requireLogin here
+app.get('/deleteChat/:id', (request, response) => {
+    Chat.deleteOne({ _id: request.params._id })
+        .then(() => {
+            response.redirect('/chats');
+        });
+});
+
+//get route to send smile
+//requireLogin here
+app.get('/sendSmile/:id', (request, response) => {
+    const newSmile = {
+        sender: request.user._id,
+        receiver: request.params.id,
+        senderSent: true
+    }
+
+    new Smile(newSmile).save((error, smile) => {
+        if (error) {
+            throw error;
+        }
+        if (smile) {
+            response.redirect(`/userProfile/${request.params.id}`);
+        }
+    })
+});
+
+//delete smile
+//requireLogin here
+app.get("/deleteSmile/:id", (request, response) => {
+    Smile.deleteOne({ receiver: request.params.id, sender: request.user.id })
+        .then(() => {
+            response.redirect(`/userProfile/${request.params.id}`)
+        })
+})
+
+//show smile sender
+//requireLogin here
+app.get('/showSmile/:id', (request, response) => {
+    Smile.findOne({ _id: request.params.id })
+        .populate('sender')
+        .populate('receiver')
+        .then((smile) => {
+            smile.receiverReceived = true;
+
+            smile.save((error, smile) => {
+                if (error) {
+                    throw error;
+                }
+                if (smile) {
+                    response.render('smile/showSmile', {
+                        title: 'New Smile',
+                        smile: smile
+                    })
+                }
+            })
+        })
+})
+
+
 
 app.get('/logout', (request, response) => {
     User.findById({ _id: request.user._id }).then((user) => {
@@ -513,6 +707,7 @@ app.get('/logout', (request, response) => {
     })
 
 })
+
 
 app.post('/contactUs', (request, response) => {
     //console.log(request.body); //will be undefined without body parser
