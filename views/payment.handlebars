@@ -1,12 +1,43 @@
 <div class="row">
-  <div class="col-sm-4">
-    <h3 class="green">$10</h3>
+  <div class="col-sm-4 payment center">
+    <h3 class="green ">$10</h3>
     <p>Buy 20 messages for $10</p>
     <form action="/charge10dollars" method="POST">
       <script src="https://checkout.stripe.com/checkout.js" class="stripe-button" data-key={{StripePublishableKey}}
-        data-amount="1000"
-         data-name="Online Dating"
-        data-description="$10 for 20 messages"
+        data-amount="1000" data-name="Online Dating" data-description="$10 for 20 messages"
+        data-image="/images/sleepturtle.png" data-locale="auto"></script>
+
+    </form>
+
+
+  </div>
+  <div class="col-sm-4 payment center">
+    <h3 class="green">$20</h3>
+    <p>Buy 50 messages for $20</p>
+    <form action="/charge20dollars" method="POST">
+      <script src="https://checkout.stripe.com/checkout.js" class="stripe-button" data-key={{StripePublishableKey}}
+        data-amount="2000" data-name="Online Dating" data-description="$20 for 50 messages"
+        data-image="/images/sleepturtle.png" data-locale="auto"></script>
+
+    </form>
+  </div>
+
+  <div class="col-sm-4 payment center">
+    <h3 class="green ">$30</h3>
+    <p>Buy 100 messages for $30</p>
+    <form action="/charge30dollars" method="POST">
+      <script src="https://checkout.stripe.com/checkout.js" class="stripe-button" data-key={{StripePublishableKey}}
+        data-amount="3000" data-name="Online Dating" data-description="$30 for 100 messages"
+        data-image="/images/sleepturtle.png" data-locale="auto"></script>
+
+    </form>
+  </div>
+  <div class="col-sm-4 payment center">
+    <h3 class="green ">$40</h3>
+    <p>Buy 300 messages for $40</p>
+    <form action="/charge40dollars" method="POST">
+      <script src="https://checkout.stripe.com/checkout.js" class="stripe-button" data-key={{StripePublishableKey}}
+        data-amount="4000" data-name="Online Dating" data-description="$40 for 300 messages"
         data-image="/images/sleepturtle.png" data-locale="auto"></script>
 
     </form>

@@ -582,7 +582,7 @@ app.get('/chats', (request, response) => {
 })
 
 
-//charge client
+//charge 10 dollars
 //requireLogin
 app.post('/charge10dollars', (request, response) => {
     console.log(request.body);
@@ -614,6 +614,150 @@ app.post('/charge10dollars', (request, response) => {
                 User.findById({ _id: request.user._id })
                     .then((user) => {
                         user.wallet += 20;
+                        user.save()
+                            .then(() => {
+                                response.render('success', {
+                                    title: 'Success',
+                                    charge: charge
+                                })
+                            })
+                    })
+            }).catch((error) => {
+                console.log(error);
+            })
+        }).catch((error) => {
+            console.log(error);
+        })
+})
+
+//charge 20 dollars
+//requireLogin
+app.post('/charge20dollars', (request, response) => {
+    console.log(request.body);
+    const amount = 2000;
+    stripe.customers.create({
+            email: request.body.stripeEmail,
+            source: request.body.stripeToken
+        })
+        .then((customer) => {
+            stripe.charges.create({
+
+                amount: amount,
+                description: '$20 for 50 messages',
+                currency: 'usd',
+                customer: customer.id,
+                receipt_email: customer.email,
+                shipping: {
+                    address: {
+                        city: "ontario",
+                        country: "canada",
+                        line1: "mandir gate",
+                        line2: "narendrapur",
+                        postal_code: "m5m1j4",
+                        state: "toronto"
+                    },
+                    name: "Sayantan Mukherjee"
+                }
+            }).then((charge) => {
+                User.findById({ _id: request.user._id })
+                    .then((user) => {
+                        user.wallet += 50;
+                        user.save()
+                            .then(() => {
+                                response.render('success', {
+                                    title: 'Success',
+                                    charge: charge
+                                })
+                            })
+                    })
+            }).catch((error) => {
+                console.log(error);
+            })
+        }).catch((error) => {
+            console.log(error);
+        })
+})
+
+//charge 30 dollars
+//requireLogin
+app.post('/charge30dollars', (request, response) => {
+    console.log(request.body);
+    const amount = 3000;
+    stripe.customers.create({
+            email: request.body.stripeEmail,
+            source: request.body.stripeToken
+        })
+        .then((customer) => {
+            stripe.charges.create({
+
+                amount: amount,
+                description: '$30 for 100 messages',
+                currency: 'usd',
+                customer: customer.id,
+                receipt_email: customer.email,
+                shipping: {
+                    address: {
+                        city: "ontario",
+                        country: "canada",
+                        line1: "mandir gate",
+                        line2: "narendrapur",
+                        postal_code: "m5m1j4",
+                        state: "toronto"
+                    },
+                    name: "Sayantan Mukherjee"
+                }
+            }).then((charge) => {
+                User.findById({ _id: request.user._id })
+                    .then((user) => {
+                        user.wallet += 100;
+                        user.save()
+                            .then(() => {
+                                response.render('success', {
+                                    title: 'Success',
+                                    charge: charge
+                                })
+                            })
+                    })
+            }).catch((error) => {
+                console.log(error);
+            })
+        }).catch((error) => {
+            console.log(error);
+        })
+})
+
+//charge 40 dollars
+//requireLogin
+app.post('/charge40dollars', (request, response) => {
+    console.log(request.body);
+    const amount = 4000;
+    stripe.customers.create({
+            email: request.body.stripeEmail,
+            source: request.body.stripeToken
+        })
+        .then((customer) => {
+            stripe.charges.create({
+
+                amount: amount,
+                description: '$40 for 300 messages',
+                currency: 'usd',
+                customer: customer.id,
+                receipt_email: customer.email,
+                shipping: {
+                    address: {
+                        city: "ontario",
+                        country: "canada",
+                        line1: "mandir gate",
+                        line2: "narendrapur",
+                        postal_code: "m5m1j4",
+                        state: "toronto"
+                    },
+                    name: "Sayantan Mukherjee"
+                }
+            }).then((charge) => {
+                User.findById({ _id: request.user._id })
+                    .then((user) => {
+                        user.wallet += 300;
                         user.save()
                             .then(() => {
                                 response.render('success', {
