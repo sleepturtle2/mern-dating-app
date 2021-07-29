@@ -1,34 +1,96 @@
-<div class="card" style="width: 18rem;">
-{{#if oneUser.image}}
-<img src="{{oneUser.image}}" width="100%" alt="">
-{{else}}
-<img src="/images/default-user.png" width="100%" alt="">
-{{/if}}
-  <div class="card-body">
-    <h5 class="card-title">{{oneUser.fullname}}</h5>
-    <small class="card-text">{{oneUser.gender}}</small>
-    <p class="card-text">{{oneUser.about}}</p>
-    <a href="/startChat/{{oneUser._id}}"  class="btn btn-primary">
-      <i class="fa fa-commenting"></i>
-    </a>
+<div class="row">
+  <div class="col-sm-5">
+    <div class="card" style="width: 18rem;">
+      {{#if oneUser.image}}
+      <img src="{{oneUser.image}}" width="100%" alt="">
+      {{else}}
+      <img src="/images/default-user.png" width="100%" alt="">
+      {{/if}}
+      <div class="card-body">
 
-    {{#if smile}}
-    <a href="/deleteSmile/{{oneUser._id}}" class="btn btn-danger">
-      <i class="fa fa-smile-o" id="newsmile"></i>
-    </a>
-    <script>
-      var smile = document.getElementById("newsmile");
-      setInterval(function(){
-        smile.style.color = "white";
-      }, 100)
-      setInterval(function(){
-        smile.style.color = "red";
-      }, 300)
-    </script>
-    {{else}}
-    <a href="/sendSmile/{{oneUser._id}}" class="btn btn-outline-danger">
-      <i class="fa fa-smile-o"></i>
-    </a>
-    {{/if}}
+        <small class="card-text">{{oneUser.gender}}</small>
+        <p class="card-text">{{oneUser.about}}</p>
+        <a href="/startChat/{{oneUser._id}}" class="btn btn-primary">
+          <i class="fa fa-commenting"></i>
+        </a>
+
+        {{#if smile}}
+        <a href="/deleteSmile/{{oneUser._id}}" class="btn btn-danger">
+          <i class="fa fa-smile-o" id="newsmile"></i>
+        </a>
+        <script>
+          var smile = document.getElementById("newsmile");
+          setInterval(function () {
+            smile.style.color = "white";
+          }, 100)
+          setInterval(function () {
+            smile.style.color = "red";
+          }, 300)
+        </script>
+        {{else}}
+        <a href="/sendSmile/{{oneUser._id}}" class="btn btn-outline-danger">
+          <i class="fa fa-smile-o"></i>
+        </a>
+        {{/if}}
+      </div>
+    </div>
   </div>
+  <div class="col-sm-5">
+    <h2 class="center">Profile</h2>
+    <h5><i class="fa fa-user"></i> {{oneUser.fullname}}</h5>
+    <h5> <i class="fa fa-mars"></i> {{oneUser.gender}}</h5>
+    <h5><i class="fa fa-address-book"></i> {{oneUser.about}}</h5>
+  </div>
+</div>
+
+<hr>
+<div class="container">
+  <h2 class="center">Public Posts</h2>
+  {{#each publicPosts}}
+  <div class="media">
+    <a href="/userProfile/{{postUser._id}}">
+      <img src="{{postUser.image}}" class="mr-3" width="64px">
+    </a>
+    <div class="media-body">
+      <h5 class="mt-0">{{title}}</h5>
+      <p>{{body}}</p>
+      <img src="{{image}}" class="img-fluid">
+      <br>
+      <small>{{getLastMoment date 'hour'}}</small>
+      {{#if allowComments}}
+      {{#each comments}}
+      <div class="media mt-3">
+        <a class="mr-3" href="/userProfile/{{commentUser._id}}">
+          <img src="{{commentUser.image}}" class="mr-3" width="64px">
+        </a>
+        <div class="media-body">
+          <p>{{commentBody}}</p>
+          <br>
+          <small>{{getLastMoment date 'hour'}}</small>
+        </div>
+      </div>
+      {{/each}}
+      {{/if}}
+      {{#each likes}}
+      <div class="media mt-3">
+        <a class="mr-3" href="/userProfile/{{likeUser._id}}">
+          <img src="{{likeUser.image}}" class="mr-3" width="20px">
+        </a>
+        <div class="media-body">
+          <h5 class="mt-0"><i class="fa fa-thumbs-up"></i></h5>
+          <br>
+          <small>{{getLastMoment date 'hour'}}</small>
+        </div>
+      </div>
+      {{/each}}
+
+     <h4>
+       <a href="/likePost/{{_id}}"><i class="fa fa-thumbs-up post-icons"></i></a>
+      <a href="/fullpost/{{_id}}"><i class="fa fa-comment post-icons"></i></a>
+     </h4>
+    </div>
+  </div>
+  {{else}}
+  <p>User does not have any public posts</p>
+  {{/each}}
 </div>

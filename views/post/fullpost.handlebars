@@ -1,0 +1,68 @@
+<div class="media">
+  <a href="/userProfile/{{post.postUser._id}}">
+    <img src="{{post.postUser.image}}" class="mr-3" width="64px">
+  </a>
+  <div class="media-body">
+    <h5 class="mt-0">{{title}}</h5>
+    <p>{{post.body}}</p>
+    <br>
+    <small>{{getLastMoment date 'hour'}}</small>
+    <hr>
+    {{#each post}}
+    {{#each comments}}
+    <div class="media mt-3">
+      <a class="mr-3" href="/userProfile/{{commentUser._id}}">
+        <img src="{{commentUser.image}}" class="mr-3" width="20px">
+      </a>
+      <div class="media-body">
+        <p>{{commentBody}}</p>
+        <br>
+        <small>{{getLastMoment date 'hour'}}</small>
+      </div>
+    </div>
+    <hr>
+    {{/each}}
+    {{/each}}
+
+    {{#each post}}
+    {{#each likes}}
+    <div class="media mt-3">
+      <a class="mr-3" href="/userProfile/{{likeUser._id}}">
+        <img src="{{likeUser.image}}" class="mr-3" width="20px">
+      </a>
+      <div class="media-body">
+        <h5 class="mt-0"><i class="fa fa-thumbs-up post-icons"></i></h5>
+        <br>
+        <small>{{getLastMoment date 'hour'}}</small>
+      </div>
+    </div>
+    {{/each}}
+    {{/each}}
+
+    <br>
+    <h4>
+      <a href="/likePost/{{post._id}}">
+        <i class="fa fa-thumbs-up"></i>
+      </a>
+
+      <a href="#" id="comment-icon" onclick="displayCommentForm()"><i class="fa fa-comment post-icons"></i></a>
+    </h4>
+
+    {{#if post.allowComments}}
+    <form id="comment_form"  action="/leaveComment/{{post._id}}" method="POST" class="form-inline" style="display:none">
+      <div class="form-group mx-sm-2 mb-2">
+        <input type="text" name="commentBody" class="form-control" placeholder="Leave comment">
+      </div>
+      <button class="btn btn-primary mb-2" type="submit"><i class="fa fa-comment"></i></button>
+    </form>
+    <script>
+      function displayCommentForm(){
+        document.getElementById('comment-icon').style.display = "none";
+        document.getElementById('comment_form').style.display = "block";
+      }
+    </script>
+    {{else}}
+    <p class="red">Comments are turned off for this post</p>
+    {{/if}}
+  </div>
+</div>

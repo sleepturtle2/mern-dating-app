@@ -21,7 +21,7 @@ const Message = require('./models/message');
 const User = require('./models/user');
 const Chat = require('./models/chat');
 const Smile = require('./models/smile');
-
+const Post = require('./models/post');
 
 const app = express();
 
@@ -149,13 +149,30 @@ app.get('/profile', (request, response) => {
                                     ]
                                 })
                                 .then((unread) => {
-                                    response.render('profile', {
-                                        title: 'Profile',
-                                        user: user,
-                                        newSmile: newSmile,
-                                        unread: unread
-                                    })
+                                    Post.find({ postUser: request.user._id })
+                                        .populate('postUser')
+                                        .sort({ date: 'desc' })
+                                        .then((posts) => {
+                                            if (posts) {
+                                                response.render('profile', {
+                                                    title: 'Profile',
+                                                    user: user,
+                                                    newSmile: newSmile,
+                                                    unread: unread,
+                                                    posts: posts
+                                                })
 
+                                            } else {
+                                                console.log('no user posts');
+                                                response.render('profile', {
+                                                    title: 'Profile',
+                                                    user: user,
+                                                    newSmile: newSmile,
+                                                    unread: unread
+                                                })
+
+                                            }
+                                        })
                                 })
 
                         })
@@ -284,17 +301,25 @@ app.use('/singles', (request, response) => {
 })
 
 
-
+//requirelogin here
 app.get('/userProfile/:id', (request, response) => {
     User.findById({ _id: request.params.id })
         .then((user) => {
             Smile.findOne({ receiver: request.params.id })
                 .then((smile) => {
-                    response.render('userProfile', {
-                        title: 'Profile',
-                        oneUser: user,
-                        smile: smile
-                    });
+                    Post.find({ status: 'public', postUser: user._id })
+                        .populate('postUser')
+                        .populate('likes.likeUser')
+                        .populate('comments.commentUser')
+                        .then((publicPosts) => {
+
+                            response.render('userProfile', {
+                                title: 'Profile',
+                                oneUser: user,
+                                smile: smile,
+                                publicPosts: publicPosts
+                            });
+                        })
                 });
         });
 });
@@ -835,6 +860,183 @@ app.get('/showSmile/:id', (request, response) => {
 })
 
 
+//get method to display post form
+//requirelogin here
+app.get('/displayPost', (request, response) => {
+    response.render('post/displayPostForm', {
+        title: 'Post'
+    });
+})
+
+//create post
+//requirelogin here
+app.post('/createPost', (request, response) => {
+    let allowComments = Boolean;
+    if (request.body.allowComments) {
+        allowComments = true;
+    } else {
+        allowComments = false;
+    }
+    console.log(request.body);
+    const newPost = {
+        title: request.body.title,
+        body: request.body.body,
+        status: request.body.status,
+        image: `https://sleepturtle-dating-app.s3.us-east-2.amazonaws.com/${request.body.image}`,
+        postUser: request.user._id,
+        allowComments: allowComments,
+        date: new Date()
+    };
+
+    if (request.body.status === 'public') {
+        newPost.icon = 'fa fa-globe';
+    } else if (request.body.status === 'private') {
+        newPost.icon = 'fa fa-key';
+    } else {
+        newPost.icon = 'fa fa-group';
+    }
+    new Post(newPost).save()
+        .then(() => {
+            if (request.body.status === 'public') {
+                response.redirect('/posts');
+            } else {
+                response.redirect('/profile');
+            }
+        })
+})
+
+
+//display all public posts
+//requirelogin here
+app.get('/posts', (request, response) => {
+    Post.find({ status: 'public' })
+        .populate('postUser')
+        .sort({ date: 'desc' })
+        .then((posts) => {
+            response.render('post/posts', {
+                title: 'Posts',
+                posts: posts
+            })
+        })
+})
+
+//delete posts
+//requirelogin here
+app.get('/deletePost/:id', (request, response) => {
+    Post.deleteOne({ _id: request.params.id })
+        .then(() => {
+            response.redirect('/profile');
+        })
+
+})
+
+//edit posts
+//requireLogin here
+app.get('/editPost/:id', (request, response) => {
+    Post.findById({ _id: request.params.id })
+        .then((post) => {
+            response.render('post/editPost', {
+                title: 'Edit Post',
+                post: post
+            })
+        })
+})
+
+//submit form to save update post
+//requirelogin
+app.post('/editPost/:id', (request, response) => {
+    Post.findByIdAndUpdate({ _id: request.params.id })
+        .then((post) => {
+            let allowComments = Boolean;
+
+            if (request.body.allowComments) {
+                allowComments = true;
+            } else {
+                allowComments = false;
+            }
+
+
+            post.title = request.body.title;
+            post.body = request.body.body;
+            post.status = request.body.status;
+            post.image = `https://sleepturtle-dating-app.s3.us-east-2.amazonaws.com/${request.body.image}`;
+            post.date = new Date();
+            post.allowComments = allowComments;
+
+            if (request.body.status === 'public') {
+                post.icon = 'fa fa-globe';
+            } else if (request.body.status === 'private') {
+                post.icon = 'fa fa-key';
+            } else {
+                post.icon = 'fa fa-group';
+            }
+
+            post.save()
+                .then(() => {
+                    response.redirect('/profile');
+                })
+        })
+})
+
+//add like for each post
+//requirelogin here
+app.get('/likePost/:id', (request, response) => {
+    Post.findById({ _id: request.params.id })
+        .then((post) => {
+            const newLike = {
+                likeUser: request.user._id,
+                date: new Date()
+            }
+
+            post.likes.push(newLike)
+            post.save((error, post) => {
+                if (error) {
+                    throw error;
+                }
+                if (post) {
+                    response.redirect(`/fullPost/${post._id}`);
+                }
+            })
+        })
+})
+
+//requirelogin here
+app.get('/fullPost/:id', (request, response) => {
+    Post.findById({ _id: request.params.id })
+        .populate('postUser')
+        .populate('likes.likeUser')
+        .populate('comments.commentUser')
+        .sort({ date: 'desc' })
+        .then((post) => {
+            response.render('post/fullpost', {
+                title: 'Full Post',
+                post: post
+            })
+        })
+})
+
+//submit form to leave comment
+//requireLogin here
+app.post('/leaveComment/:id', (request, response) => {
+    Post.findById({ _id: request.params.id })
+        .then((post) => {
+            const newComment = {
+                commentUser: request.user._id,
+                commentBody: request.body.commentBody,
+                date: new Date()
+            }
+
+            post.comments.push(newComment)
+            post.save(((error, post) => {
+                if (error) {
+                    throw error;
+                }
+                if (post) {
+                    response.redirect(`/fullPost/${post._id}`);
+                }
+            }))
+        })
+})
 
 app.get('/logout', (request, response) => {
     User.findById({ _id: request.user._id }).then((user) => {

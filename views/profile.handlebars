@@ -48,7 +48,34 @@
   </div>
 
 </div>
+<hr>
 
+<div class="container">
+  <h2 class="center">My Posts</h2>
+  {{#each posts}}
+  <div class="media">
+    <img src="{{postUser.image}}" class="mr-3" width="20px">
+    <div class="media-body">
+      <h5 class="mt-0">{{postUser.fullname}}</h5>
+      <small>{{status}} <i class="{{icon}}"></i></small>
+      <p>{{body}}</p>
+      <p>{{image}}</p>
+      {{#if image}}
+      <img src="{{image}}" class="img-fluid" width="64px">
+      {{/if}}
+      <br>
+      <small>{{getLastMoment date 'hour'}}</small>
+      <br>
+      <p>
+        <a href="/editPost/{{_id}}"><i class="fa fa-pencil post-icons"></i></a>
+        <a href="/deletePost/{{_id}}"><i class="fa fa-trash post-icons"></i></a>
+      </p>
+    </div>
+  </div>
+  {{else}}
+  <p>No posts to show</p>
+  {{/each}}
+</div>
 <script>
   function editProfile(){
     document.getElementById('profile-info').style.display = 'none';
