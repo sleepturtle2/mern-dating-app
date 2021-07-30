@@ -71,3 +71,36 @@ h1 {
 .post-icons {
     margin-right: 10px;
 }
+
+.btn-facebook {
+    border-radius: 0;
+    color: #fff;
+    width: auto;
+}
+
+.btn-facebook:link,
+.btn-facebook:visited {
+    color: #fff;
+    text-decoration: none;
+}
+
+.btn-facebook:active,
+.btn-facebook:hover {
+    color: #fff;
+}
+
+
+/*google btn*/
+
+.btn-google {
+    color: #fff;
+    width: auto;
+    border-radius: 0;
+}
+
+.btn-google:link,
+.btn-google:visited,
+.btn-google:hover,
+.btn-google:active {
+    color: #fff;
+}
