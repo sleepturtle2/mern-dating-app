@@ -15,13 +15,13 @@
     <p class="center">or</p>
     <form action="/login" method="POST">
 
-    {{#each success}}
-    <p class="green">{{text}}</p>
-    {{/each}}
+      {{#each success}}
+      <p class="green">{{text}}</p>
+      {{/each}}
 
-    {{#each errors}}
-    <p class="red">{{text}}</p>
-    {{/each}}
+      {{#each errors}}
+      <p class="red">{{text}}</p>
+      {{/each}}
       <div class="form-group">
         <h2 class="center">Register</h2>
         <label for="email">Email</label>
@@ -33,7 +33,9 @@
       </div>
       <button type="submit" class="btn btn-primary">Login</button>
     </form>
+    <a href="/retrievePwd">Forgot password?</a>
+    <br>
     <a href="/newAccount">Need Account?</a>
   </div>
   <div class="col"></div>
-{{/if}}
+  {{/if}}

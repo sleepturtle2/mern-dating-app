@@ -338,7 +338,48 @@ app.get('/loginErrors', (request, response) => {
     });
 });
 
+//retrieve password
+app.get('/retrievePwd', (request, response) => {
+    response.render('retrievePwd', {
+        title: "Retrieve"
+    })
+})
 
+app.post('/retrievePwd', (request, response) => {
+    let email = request.body.email.trim();
+    let pwd1 = request.body.password.trim();
+    let pwd2 = request.body.password2.trim();
+
+    if (pwd1 !== pwd2) {
+        response.render('pwdDoesNotMatch', {
+            title: 'Not match'
+        })
+    }
+
+    User.findOne({ email: email })
+        .then((user) => {
+            if (user) {
+                let salt = bcrypt.genSaltSync(10);
+                let hash = bcrypt.hashSync(pwd1, salt);
+
+                user.password = hash;
+                user.save((error, user) => {
+                    if (error) {
+                        throw error;
+                    }
+                    if (user) {
+                        response.render('pwdUpdated', {
+                            title: 'Password Updated'
+                        })
+                    }
+                })
+            } else {
+                response.render('emailDoesNotExist', {
+                    title: 'Email does not exist'
+                })
+            }
+        })
+})
 
 //start chat process
 //requireLogin here
