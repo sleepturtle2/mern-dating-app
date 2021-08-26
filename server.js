@@ -10,6 +10,8 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const bcrypt = require('bcryptjs');
 const formidable = require('formidable');
+const socket = require('socket.io');
+const http = require('http');
 
 
 //load stripe module
@@ -114,7 +116,7 @@ app.get('/auth/facebook', passport.authenticate('facebook', {
     scope: ['email']
 }));
 app.get('/auth/facebook/callback', passport.authenticate('facebook', {
-    successRedirect: '/profile',
+    successRedirect: '/askMore',
     failureRedirect: '/'
 }));
 
@@ -124,7 +126,7 @@ app.get('/auth/google', passport.authenticate('google', {
 
 }));
 app.get('/auth/google/callback', passport.authenticate('google', {
-    successRedirect: '/profile',
+    successRedirect: '/askMore',
     failureRedirect: '/'
 }));
 
@@ -360,9 +362,38 @@ app.get('/userProfile/:id', (request, response) => {
 
 
 app.post('/login', passport.authenticate('local', {
-    successRedirect: '/profile',
+    successRedirect: '/askMore',
     failureRedirect: 'loginErrors'
 }));
+
+//requirelogin
+app.post('/askMore', (request, response) => {
+    User.findById({ _id: request.user._id })
+        .then((user) => {
+            user.gender = request.body.gender;
+            user.age = request.body.age;
+
+            user.save()
+                .then(() => {
+                    response.redirect('/profile');
+                })
+        })
+})
+
+//ask user to finish signup
+app.get('/askMore', (request, response) => {
+    User.findById({ _id: request.user._id })
+        .then((user) => {
+            if (!user.gender || !user.age) {
+                response.render('askMore', {
+                    title: 'Finish',
+                    user: user
+                })
+            } else {
+                response.redirect('/profile');
+            }
+        })
+})
 
 app.get('/loginErrors', (request, response) => {
     let errors = [];
@@ -1279,6 +1310,7 @@ app.post('/contactUs', (request, response) => {
         }
     });
 });
+
 
 
 app.listen(port, () => {
