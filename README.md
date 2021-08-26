@@ -1,3 +1,3 @@
 # Dating App
 
-Visit [here](https://mern-dating.herokuapp.com/): 
+Visit [here](https://mern-dating.herokuapp.com/)
