@@ -104,3 +104,21 @@ h1 {
 .btn-google:active {
     color: #fff;
 }
+
+.fa-paperclip {
+    cursor: pointer;
+}
+
+.pictures {
+    border: 1px solid grey;
+    margin: 5px;
+    padding: 5px;
+}
+
+.picture {
+    margin-bottom: 3px;
+}
+
+.image-icons {
+    margin: 5px;
+}

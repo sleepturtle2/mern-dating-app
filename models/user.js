@@ -54,7 +54,26 @@ const userSchema = new Schema({
     date: {
         type: Date,
         default: Date.now
-    }
+    },
+    friends: [{
+        friend: {
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        isFriend: {
+            type: Boolean,
+            default: false
+        }
+    }],
+    pictures: [{
+        image: {
+            type: String
+        },
+        date: {
+            type: Date,
+            default: Date.now
+        }
+    }]
 });
 
 module.exports = mongoose.model('User', userSchema);

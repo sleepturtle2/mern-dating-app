@@ -48,6 +48,18 @@
 
   {{/if}}
 
+
+  {{#if user.friends}}
+  {{#each user.friends}}
+    {{#if isFriend}}
+
+    {{else}}
+      <a class="navbar-brand" href="/showFriendRequest/{{friend._id}}"><i id="friendRequestIcon" class="fa fa-user-plus"></i></a>
+    {{/if}}
+  {{/each}}
+  {{/if}}
+
+
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
     aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
@@ -85,6 +97,11 @@
       <li class="nav-item">
         <a class="nav-link" href="/displayPost">
           <i class="fa fa-plus-square">Create Post</i></a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="/friends">
+          <i class="fa fa-group">Friends</i></a>
       </li>
 
       <li class="nav-item">

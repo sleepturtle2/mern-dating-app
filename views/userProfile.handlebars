@@ -32,6 +32,12 @@
           <i class="fa fa-smile-o"></i>
         </a>
         {{/if}}
+
+        <a href="/sendFriendRequest/{{oneUser._id}}">
+        <button class="btn btn-outline-success">
+          <i class="fa fa-user-plus"></i>
+        </button>
+        </a>
       </div>
     </div>
   </div>
@@ -50,6 +56,24 @@
 
   </div>
 </div>
+<hr>
+
+<h2>My friends</h2>
+{{#each oneUser.friends}}
+<div class="row">
+  <div class="col-sm-3">
+    <div class="card" style="width:10rem;">
+      <img src="{{friend.image}}" class="card-img-top img-fluid" alt="...">
+      <div class="card-body">
+        <h5 class="card-title">{{friend.fullname}}</h5>
+        <a href="/userProfile/{{friend._id}}" class="btn btn-primary">View Profile</a>
+      </div>
+    </div>
+  </div>
+</div>
+{{else}}
+<p>You do not have any friends</p>
+{{/each}}
 
 <hr>
 <div class="container">
@@ -92,10 +116,10 @@
       </div>
       {{/each}}
 
-     <h4>
-       <a href="/likePost/{{_id}}"><i class="fa fa-thumbs-up post-icons"></i></a>
-      <a href="/fullpost/{{_id}}"><i class="fa fa-comment post-icons"></i></a>
-     </h4>
+      <h4>
+        <a href="/likePost/{{_id}}"><i class="fa fa-thumbs-up post-icons"></i></a>
+        <a href="/fullpost/{{_id}}"><i class="fa fa-comment post-icons"></i></a>
+      </h4>
     </div>
   </div>
   {{else}}

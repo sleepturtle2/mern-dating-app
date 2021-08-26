@@ -131,59 +131,91 @@ app.get('/auth/google/callback', passport.authenticate('google', {
 
 //requireLogin here
 app.get('/profile', (request, response) => {
-    User.findById({ _id: request.user._id }).then((user) => {
+    User.findById({ _id: request.user._id })
+        .populate('friends.friend')
+        .then((user) => {
 
-        if (user) {
-            //console.log(user);
-            user.online = true;
-            user.save((error, user) => {
-                if (error) {
-                    throw error;
-                } else {
-                    Smile.findOne({ receiver: request.user._id, receiverReceived: false })
-                        .then((newSmile) => {
-                            Chat.findOne({
-                                    $or: [
-                                        { receiver: request.user._id, receiverRead: false },
-                                        { sender: request.user._id, senderRead: false }
-                                    ]
-                                })
-                                .then((unread) => {
-                                    Post.find({ postUser: request.user._id })
-                                        .populate('postUser')
-                                        .sort({ date: 'desc' })
-                                        .then((posts) => {
-                                            if (posts) {
-                                                response.render('profile', {
-                                                    title: 'Profile',
-                                                    user: user,
-                                                    newSmile: newSmile,
-                                                    unread: unread,
-                                                    posts: posts
-                                                })
+            if (user) {
+                //console.log(user);
+                user.online = true;
+                user.save((error, user) => {
+                    if (error) {
+                        throw error;
+                    } else {
+                        Smile.findOne({ receiver: request.user._id, receiverReceived: false })
+                            .then((newSmile) => {
+                                Chat.findOne({
+                                        $or: [
+                                            { receiver: request.user._id, receiverRead: false },
+                                            { sender: request.user._id, senderRead: false }
+                                        ]
+                                    })
+                                    .then((unread) => {
+                                        Post.find({ postUser: request.user._id })
+                                            .populate('postUser')
+                                            .sort({ date: 'desc' })
+                                            .then((posts) => {
+                                                if (posts) {
+                                                    response.render('profile', {
+                                                        title: 'Profile',
+                                                        user: user,
+                                                        newSmile: newSmile,
+                                                        unread: unread,
+                                                        posts: posts
+                                                    })
 
-                                            } else {
-                                                console.log('no user posts');
-                                                response.render('profile', {
-                                                    title: 'Profile',
-                                                    user: user,
-                                                    newSmile: newSmile,
-                                                    unread: unread
-                                                })
+                                                } else {
+                                                    console.log('no user posts');
+                                                    response.render('profile', {
+                                                        title: 'Profile',
+                                                        user: user,
+                                                        newSmile: newSmile,
+                                                        unread: unread
+                                                    })
 
-                                            }
-                                        })
-                                })
+                                                }
+                                            })
+                                    })
 
-                        })
-                }
-            })
-        }
-    })
+                            })
+                    }
+                })
+            }
+        })
 })
 
+//upload pictures
+//requirelogin here
+app.post('/uploadPictures', (request, response) => {
+    User.findById({ _id: request.user._id })
+        .then((user) => {
+            const newImage = {
+                image: `https://sleepturtle-dating-app.s3.us-east-2.amazonaws.com/${request.body.upload}`,
+                date: new Date()
+            }
+            user.pictures.push(newImage)
+            user.save()
+                .then(() => {
+                    response.redirect('/profile');
+                })
+        })
+})
 
-//requireLogin here
+//delete picture
+//requirelogin here
+app.get('/deletePicture/:id', (request, response) => {
+        User.findById({ _id: request.user._id })
+            .then((user) => {
+                user.pictures.id(request.params.id).remove()
+                user.save((error) => {
+                    if (error)
+                        throw error;
+                    else
+                        response.redirect('/profile');
+                })
+            })
+    })
+    //requireLogin here
 app.post('/updateProfile', (request, response) => {
     User.findById({ _id: request.user._id })
         .then((user) => {
@@ -304,6 +336,7 @@ app.use('/singles', (request, response) => {
 //requirelogin here
 app.get('/userProfile/:id', (request, response) => {
     User.findById({ _id: request.params.id })
+        .populate('friends.friend')
         .then((user) => {
             Smile.findOne({ receiver: request.params.id })
                 .then((smile) => {
@@ -311,15 +344,16 @@ app.get('/userProfile/:id', (request, response) => {
                         .populate('postUser')
                         .populate('likes.likeUser')
                         .populate('comments.commentUser')
-                        .then((publicPosts) => {
 
-                            response.render('userProfile', {
-                                title: 'Profile',
-                                oneUser: user,
-                                smile: smile,
-                                publicPosts: publicPosts
-                            });
-                        })
+                    .then((publicPosts) => {
+
+                        response.render('userProfile', {
+                            title: 'Profile',
+                            oneUser: user,
+                            smile: smile,
+                            publicPosts: publicPosts
+                        });
+                    })
                 });
         });
 });
@@ -1078,6 +1112,127 @@ app.post('/leaveComment/:id', (request, response) => {
             }))
         })
 })
+
+//Start friend request process
+//requireLogin here
+app.get('/sendFriendRequest/:id', (request, response) => {
+    User.findOne({ _id: request.params.id })
+        .then((user) => {
+            let newFriendRequest = {
+                friend: request.user._id
+            }
+
+            user.friends.push(newFriendRequest)
+
+            user.save((error, user) => {
+                if (error) {
+                    throw error;
+                }
+                if (user) {
+                    response.render('friends/askFriendRequest', {
+                        title: 'Request',
+                        newFriend: user
+                    })
+                }
+            })
+        })
+})
+
+//requireLogin here
+app.get('/showFriendRequest/:id', (request, response) => {
+    User.findOne({ _id: request.params.id })
+        .then((userRequest) => {
+            response.render('friends/showFriendRequest', {
+                title: 'Request',
+                newFriend: userRequest
+            })
+        })
+})
+
+//accept friend request
+//requireLogin here
+app.get('/acceptFriend/:id', (request, response) => {
+
+    User.findById({ _id: request.user.id })
+        .populate('friends.friend')
+        .then((user) => {
+            user.friends.filter((friend) => {
+                if (friend._id = request.params.id) {
+                    friend.isFriend = true;
+                    user.save()
+                        .then(() => {
+                            User.findById({ _id: request.params.id })
+                                .then((requestSender) => {
+                                    let newFriend = {
+                                        friend: request.user._id,
+                                        isFriend: true
+                                    }
+                                    requestSender.friends.push(newFriend)
+                                    requestSender.save()
+                                        .then(() => {
+                                            User.findById({ _id: request.user._id })
+                                                .populate('friends.friend')
+                                                .sort({ date: 'desc' })
+                                                .then((user) => {
+                                                    response.render('friends/friendAccepted', {
+                                                        title: 'NewFriend',
+                                                        userInfo: user
+                                                    })
+                                                })
+                                        })
+                                })
+                        })
+                } else {
+                    response.render('friends/404', {
+                        title: 'Not found'
+                    })
+                }
+            })
+        }).catch((error) => {
+            console.log(error);
+        })
+})
+
+//requirelogin
+app.get('/friends', (request, response) => {
+    User.findById({ _id: request.user._id })
+        .populate('friends.friend')
+        .then((user) => {
+            response.render('friends/friends', {
+                title: 'Friends',
+                userFriends: user
+            })
+        })
+})
+
+//reject friend request
+//requirelogin
+app.get('/rejectFriend/:id', (request, response) => {
+    User.findById({ _id: request.user._id })
+        .populate('friends.friend')
+        .then((user) => {
+            user.friends.filter((friend) => {
+                if (friend._id = request.params.id) {
+                    user.friends.pop(friend);
+                    user.save()
+                        .then(() => {
+                            User.findOne({ _id: request.params.id })
+                                .then((friend) => {
+                                    response.render('friends/rejectFriendRequest', {
+                                        title: 'Rejected',
+                                        friend: friend
+                                    })
+                                })
+                        })
+                } else {
+                    response.render('friends/404', {
+                        title: 'Not found'
+                    });
+                }
+            })
+        })
+})
+
 
 app.get('/logout', (request, response) => {
     User.findById({ _id: request.user._id }).then((user) => {
