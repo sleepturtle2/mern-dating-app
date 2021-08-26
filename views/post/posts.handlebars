@@ -1,11 +1,12 @@
 {{#each posts}}
 <div class="media">
-  <img src="{{postUser.image}}" class="mr-3" width="64px">
+  <a href="/userProfile/{{postUser._id}}"><img src="{{postUser.image}}" class="mr-3" width="64px"></a>
   <div class="media-body">
     <h5 class="mt-0">{{title}}</h5>
+    <small>{{getLastMoment date 'hour'}}</small>
     <img src="{{image}}" width="64px">
     <p>{{body}}</p>
-    <small>{{getLastMoment date 'hour'}}</small>
+
     <br>
     <h4>
       <a href="/likePost/{{_id}}">
